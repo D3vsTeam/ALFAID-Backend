@@ -3,6 +3,7 @@ import { NotFound, Unauthorized, } from "http-errors"
 import prismaClient from "../prisma";
 import bcrypt from "bcryptjs";
 import { sign } from "jsonwebtoken";
+import { isAllowToSignIn, isManager } from "../tools/ToolPermissions";
 
 export class AuthService {
 
@@ -10,7 +11,14 @@ export class AuthService {
     const { cpf, senha } = data;
 
     const funcionario = await prismaClient.funcionario.findUnique({
-      where: { cpf }
+      where: { cpf },
+      include: {
+        funcoes: {
+          select: {
+            descricao: true
+          }
+        }
+      }
     })
 
     if (!funcionario || !senha || !funcionario.senha)
@@ -23,6 +31,8 @@ export class AuthService {
 
     delete funcionario.senha;
 
+    const isManager = this.verifyAndGetPermissions(funcionario.permission_id)
+
     const token = sign(
       {
         funcionario: {
@@ -30,6 +40,8 @@ export class AuthService {
           email: funcionario.email,
           cpf: funcionario.cpf,
           permission_id: funcionario.permission_id,
+          isManager,
+          funcao: funcionario.funcoes.descricao
         }
       },
       process.env.JWT_SECRET as string,
@@ -39,5 +51,13 @@ export class AuthService {
     )
 
     return { ...funcionario, token }
+  }
+
+  static verifyAndGetPermissions(permission_id: number) {
+    if (isAllowToSignIn(permission_id)) {
+      return isManager(permission_id)
+    } else {
+      throw new Unauthorized("Funcionário não possui permissão para acessar!")
+    }
   }
 }

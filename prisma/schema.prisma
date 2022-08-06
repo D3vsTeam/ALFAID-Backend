@@ -48,7 +48,7 @@ model permissoes {
 
 model ponto {
   matricula        Int       @db.UnsignedInt
-  data             DateTime  @db.Date
+  data             DateTime  @db.Date @default(now())
   nome             String?   @db.VarChar(100)
   cargo            String?   @db.VarChar(100)
   centroCusto      String?   @db.VarChar(100)
