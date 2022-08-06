@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model derivacoes {
+  produto_id String  @db.VarChar(50)
+  derivacao  String  @db.VarChar(50)
+  descricao  String  @db.VarChar(100)
+  produto    produto @relation(fields: [produto_id], references: [codigo], onDelete: NoAction, onUpdate: NoAction, map: "der_pro_produto_FK")
+
+  @@id([produto_id, derivacao])
+}
+
+model funcionario {
+  cpf           String     @id @db.VarChar(100)
+  senha         String?    @default("") @db.VarChar(100)
+  nome          String     @db.VarChar(100)
+  email         String?    @default("") @db.VarChar(100)
+  permission_id BigInt     @db.UnsignedBigInt
+  status        Int?       @db.TinyInt
+  matricula     String     @db.VarChar(100)
+  dataAdmissao  DateTime   @db.Timestamp(0)
+  funcao_id     String?    @db.VarChar(10)
+  funcoes       funcoes?   @relation(fields: [funcao_id], references: [codigo], onDelete: NoAction, onUpdate: NoAction, map: "fun_fun_funcoes_FK")
+  permissoes    permissoes @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fun_per_permissoes_FK")
+
+  @@index([funcao_id], map: "fun_fun_funcao_FK")
+  @@index([permission_id], map: "permissoes_FK")
+}
+
+model funcoes {
+  codigo      String        @id @db.VarChar(10)
+  descricao   String        @db.VarChar(100)
+  cbo         BigInt        @db.UnsignedBigInt
+  funcionario funcionario[]
+}
+
+model permissoes {
+  id          BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  descricao   String        @db.VarChar(100)
+  funcionario funcionario[]
+}
+
+model ponto {
+  matricula        BigInt    @db.UnsignedBigInt
+  data             DateTime  @db.Date
+  nome             String?   @db.VarChar(100)
+  cargo            String?   @db.VarChar(100)
+  centroCusto      String?   @db.VarChar(100)
+  maoObra          String?   @db.VarChar(100)
+  turno            String?   @db.VarChar(100)
+  horasNormais     DateTime? @db.Time(0)
+  horasExtras      DateTime? @db.Time(0)
+  adicionalNoturno DateTime? @db.Time(0)
+  status           String?   @db.VarChar(1000)
+  experiencia      String?   @db.VarChar(100)
+  faltoso          Boolean?
+  atrasado         Boolean?
+
+  @@id([matricula, data])
+}
+
+model produto {
+  codigo     String       @id @db.VarChar(50)
+  descricao  String       @db.VarChar(100)
+  derivacoes derivacoes[]
+}
