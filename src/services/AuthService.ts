@@ -40,7 +40,6 @@ export class AuthService {
           email: funcionario.email,
           cpf: funcionario.cpf,
           permission_id: funcionario.permission_id,
-          isManager,
           funcao: funcionario.funcoes.descricao
         }
       },
@@ -50,7 +49,7 @@ export class AuthService {
       }
     )
 
-    return { ...funcionario, token }
+    return { ...funcionario, token, isManager }
   }
 
   static verifyAndGetPermissions(permission_id: number) {
