@@ -13,4 +13,15 @@ export class ProdutoController {
       });
     }
   }
+
+  static async getDerivacoes(req: Request, res: Response) {
+    try {
+      const response = await ProdutoService.getAllDerivacoes();
+      return res.json(response);
+    } catch (err: any) {
+      return res.status(err.status || 500).json({
+        message: err?.message || "Erro interno",
+      });
+    }
+  }
 }

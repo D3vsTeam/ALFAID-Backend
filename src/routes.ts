@@ -23,6 +23,7 @@ router.get("/get-equipes", ensureAuth, FuncionarioController.getEquipe);
  * Produto Routes
  */
  router.get("/get-produtos", ensureAuth, ProdutoController.getProdutos);
+ router.get("/get-derivacoes", ensureAuth, ProdutoController.getDerivacoes);
 
 
 export { router }
