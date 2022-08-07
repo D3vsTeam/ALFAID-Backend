@@ -67,6 +67,13 @@ export class ProdutoService {
             equals: " "
           }
         }
+      },
+      include: {
+        produto: {
+          select: {
+            descricao: true
+          }
+        }
       }
     })
 
